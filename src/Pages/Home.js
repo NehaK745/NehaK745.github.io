@@ -1,42 +1,49 @@
 import React, { useState } from "react";
 import { useLazyQuery } from "@apollo/client";
 import { GET_WEATHER_QUERY } from "../graphQl/Queries";
+import '../App.css';
 
 function Home() {
   const [citySearched, setCitySearched] = useState("");
-  const [getWeather, { data, error }] = useLazyQuery(GET_WEATHER_QUERY, {
+  const [getWeather, { data, error,loading }] = useLazyQuery(GET_WEATHER_QUERY, {
     variables: { name: citySearched },
   });
 
-  if (error) return <h1> Error found :( </h1>;
+
 
   if (data) {
     console.log(data);
   }
+  if(loading) return <h1> Loading...</h1>;
+if(error) return <h1> error :( </h1>;
+
 
   return (
     <div className="home">
       <h1>Search For Weather</h1>
-      <input
+      <input class='I'
         type="text"
+        value={citySearched}
         placeholder="City name..."
         onChange={(event) => {
           setCitySearched(event.target.value);
         }}
       />
-      <button onClick={() => getWeather()}> Get Weather </button>
+      <button disabled={!citySearched} onClick={() => getWeather()}> Get Weather </button>
       <div className="weather">
-        {data && (
+        {data ? (
           <>
             <h2> {data.getCityByName.name} </h2>
             <h2>
-              Temperature: {data.getCityByName.weather.temperature.actual}
+              Temperature: {Math.round(data.getCityByName.weather.temperature.actual- 273)} °C
             </h2>
             <h3>
               Description: {data.getCityByName.weather.summary.description}
             </h3>
           </>
-        )}
+        ): null}
+     
+        
       </div>
     </div>
   );
